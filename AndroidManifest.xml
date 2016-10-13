@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="cn.vfinance.demo" android:versionCode="19"
+          android:versionName="1.0">
+
+    <uses-sdk
+            android:minSdkVersion="11"
+            android:targetSdkVersion="22"/>
+
+    <!-- for all -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <!-- for Baidu pay -->
+    <!--<uses-permission android:name="android.permission.READ_PHONE_STATE"/>-->
+    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>-->
+    <!--<uses-permission android:name="android.permission.WRITE_SETTINGS"/>-->
+    <!--<uses-permission android:name="android.permission.READ_SMS"/>-->
+
+    <application
+            android:allowBackup="true"
+            android:icon="@drawable/vfinance_logo"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
+        <activity
+                android:name="cn.vfinance.demo.ShoppingCartActivity"
+                android:screenOrientation="portrait"
+                android:windowSoftInputMode="stateHidden|adjustPan"
+                android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <!-- WXPay sdk begin -->
+        <activity
+                android:name="cn.vfinance.wallet.VFWechatPaymentActivity"
+                android:launchMode="singleTop"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+
+        <activity-alias
+                android:name=".wxapi.WXPayEntryActivity"
+                android:exported="true"
+                android:targetActivity="cn.vfinance.wallet.VFWechatPaymentActivity"/>
+        <!-- WXPay sdk end -->
+
+
+        <!-- alipay sdk begin -->
+        <activity
+                android:name="com.alipay.sdk.app.H5PayActivity"
+                android:configChanges="orientation|keyboardHidden|navigation"
+                android:exported="false"
+                android:screenOrientation="behind"
+                android:windowSoftInputMode="adjustResize|stateHidden"/>
+        <!-- alipay sdk end -->
+
+
+        <!-- union pay sdk begin -->
+        <activity
+                android:name="cn.vfinance.wallet.VFUnionPaymentActivity"
+                android:configChanges="orientation|keyboardHidden"
+                android:excludeFromRecents="true"
+                android:launchMode="singleTop"
+                android:screenOrientation="portrait"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar"
+                android:windowSoftInputMode="adjustResize"/>
+        <!-- union pay sdk end -->
+
+        <!-- 支付相关 Activity 结束 -->
+
+        <!-- for test mode start -->
+        <activity
+                android:name="cn.vfinance.wallet.VFMockPayActivity"
+                android:screenOrientation="portrait"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <activity
+                android:name="cn.vfinance.wallet.WebViewActivity"
+                android:screenOrientation="portrait"/>
+        <!-- for test mode end -->
+
+        <activity
+                android:name="cn.vfinance.demo.BillListActivity"
+                android:label="@string/title_activity_bill_list">
+        </activity>
+        <activity
+                android:name="cn.vfinance.demo.RefundOrdersActivity"
+                android:label="@string/title_activity_refund_orders">
+        </activity>
+        <activity
+                android:name="cn.vfinance.demo.RefundStatusActivity"
+                android:label="@string/title_activity_refund_status">
+        </activity>
+        <activity android:name="cn.vfinance.demo.QRCodeEntryActivity"/>
+        <activity
+                android:name="cn.vfinance.demo.GenQRCodeActivity"
+                android:label="@string/title_activity_gen_qrcode">
+        </activity>
+        <activity
+                android:name="cn.vfinance.demo.ALIQRCodeActivity"
+                android:label="@string/title_activity_aliqrcode">
+        </activity>
+        <activity
+                android:name="cn.vfinance.demo.OrdersEntryActivity"
+                android:label="@string/title_activity_orders_entry">
+        </activity>
+        <activity android:name="cn.vfinance.demo.PayViaAuthCodeActivity"
+                  android:screenOrientation="portrait">
+        </activity>
+
+    </application>
+
+</manifest>
