@@ -15,10 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.*;
 import cn.vfinance.wallet.*;
 import cn.vfinance.wallet.async.VFCallback;
 import cn.vfinance.wallet.async.VFResult;
@@ -42,16 +39,16 @@ public class ShoppingCartActivity extends Activity {
     private ListView payMethod;
 
     // 微信开放平台分配给商户的 appid
-    private final String wxAppId = "wx678ad9de0bf9d684";
+    private String wxAppId = "";
 
     // 维金分配给商户的 appKey
-    private final String appId = "100120161013100063";
+    private final String appId = "100120161028100080";
 
     // 维金分配给商户的公钥
     private final String secret = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+8bLQ9baW63/7A7FLfEqf8daWg7TY+hFRZB0zTK/tJy/NzN3L3zOCs3VuhlucMSyKLNb69M05MNk/FVHmRxL0lU8DusMRYs21FMk0SFfFjArW2nGE9r+vVyhxzrIc3fvOsWhAA5arh9yX4h4H5PBloXE2rhxXGiOHgzxxOSx+BwIDAQAB";
 
     // 下单成功后, 调用维金的同步接口, 更新订单状态
-    private final String notifyUrl = "http://func68.vfinance.cn/gateway-mobile/vfinance/syn_trade";
+    private final String notifyUrl = "http://func82.vfinance.cn/gateway-mobile/vfinance/syn_trade";
 
     private String channelCode = "";
 
@@ -132,6 +129,8 @@ public class ShoppingCartActivity extends Activity {
                         //根据ID查询，此处只是演示如何通过id查询订单，并非支付必要部分
                         getBillInfoByID(vfPayResult.getId());
                     }
+
+                    generateNumber();
                 }
             });
         }
@@ -166,6 +165,17 @@ public class ShoppingCartActivity extends Activity {
                         });
                 builder.create().show();
             }
+            else if(msg.what == 2){
+                // 如果用到微信支付，在用到微信支付的Activity的onCreate函数里调用以下函数.
+                // 第二个参数需要换成你自己的微信AppID.
+                String initInfo = VFPay.initWechatPay(
+                        ShoppingCartActivity.this,
+                        wxAppId
+                );
+                if (initInfo != null) {
+                    Toast.makeText(ShoppingCartActivity.this, "微信初始化失败：" + initInfo, Toast.LENGTH_LONG).show();
+                }
+            }
             return true;
         }
     });
@@ -179,15 +189,7 @@ public class ShoppingCartActivity extends Activity {
         VFinance.setSandbox(false);
         VFinance.setAppIdAndSecret(appId, secret);
 
-        // 如果用到微信支付，在用到微信支付的Activity的onCreate函数里调用以下函数.
-        // 第二个参数需要换成你自己的微信AppID.
-        String initInfo = VFPay.initWechatPay(
-                ShoppingCartActivity.this,
-                wxAppId
-        );
-        if (initInfo != null) {
-            Toast.makeText(this, "微信初始化失败：" + initInfo, Toast.LENGTH_LONG).show();
-        }
+        generateNumber();
 
         payMethod = (ListView) this.findViewById(R.id.payMethod);
         adapter = new PayMethodListItem(this, channels);
@@ -204,7 +206,7 @@ public class ShoppingCartActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 // 支付金额(元)
-                String billTotalFee = ((EditText) findViewById(R.id.billTotalFee)).getText().toString().trim();
+                String billTotalFee = ((TextView) findViewById(R.id.billTotalFee)).getText().toString().trim();
 
                 // 转成分
 //                Double totalFee = Double.parseDouble(billTotalFee) * 100;
@@ -274,6 +276,25 @@ public class ShoppingCartActivity extends Activity {
         });
 
         getChannelData();
+        getWxAppId();
+    }
+
+    //生成订单号
+    private void generateNumber(){
+        ((EditText) findViewById(R.id.billNum)).setText("demo"+System.currentTimeMillis());
+    }
+
+    private void getWxAppId() {
+        VFQuery.getInstance().queryWxAppId(appId, new VFCallback() {
+            @Override
+            public void done(VFResult vfResult) {
+                VFWxAppIdEntity vfWxAppIdEntity = ((VFWxAppIdEntity) vfResult);
+                wxAppId = vfWxAppIdEntity.getWxAppId();
+
+                Message message = mHandler.obtainMessage(2);
+                mHandler.sendMessage(message);
+            }
+        });
     }
 
     private ArrayList<ChannelInfoEntity> channels = new ArrayList<ChannelInfoEntity>();
@@ -371,6 +392,7 @@ public class ShoppingCartActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100) {
             loadingDialog.hide();
+            generateNumber();
         }
     }
 
